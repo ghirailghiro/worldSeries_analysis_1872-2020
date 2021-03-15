@@ -24,11 +24,16 @@ loses = len(TeamMatches[((TeamMatches.home_team == Team) & (TeamMatches.home_sco
 
 drafts = len(TeamMatches[TeamMatches.home_score == TeamMatches.away_score].index)
 
-
 print("Wins : " + str(wins))
 print("Loses : " + str(loses))
 print("Drafts : " + str(drafts))
 print("Sum of W+L+D : " + str(wins+loses+drafts))
+
+goals_scored = TeamMatches[((TeamMatches.home_team == Team) & (TeamMatches.home_score > TeamMatches.away_score)) | ((TeamMatches.away_team == Team) & (TeamMatches.home_score < TeamMatches.away_score))]
+
+scores_received = TeamMatches[((TeamMatches.home_team == Team) & (TeamMatches.home_score > TeamMatches.away_score)) | ((TeamMatches.away_team == Team) & (TeamMatches.home_score < TeamMatches.away_score))]
+
+
 #Andremo ad inserire una colonna con le segueti KeyWords: W = (vittoria/Win), L = (Sconfitta/Lose) e D (Pareggio/Draft)
 '''
 match_results=[]
