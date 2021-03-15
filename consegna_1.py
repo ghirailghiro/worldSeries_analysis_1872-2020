@@ -30,11 +30,11 @@ print("Loses : " + str(loses))
 print("Drafts : " + str(drafts))
 print("Sum of W+L+D : " + str(wins+loses+drafts))
 
-goals_scored_home = TeamMatches.loc[['home_score']][(TeamMatches.home_team == Team)]
-goals_scored_away = TeamMatches.loc[['away_score']][(TeamMatches.away_team == Team)]
+goals_scored_home = TeamMatches[['home_score']][(TeamMatches.home_team == Team)]
+goals_scored_away = TeamMatches[['away_score']][(TeamMatches.away_team == Team)]
 
-goals_scored_home.rename(columns={'home_score': 'goals_scored'})
-goals_scored_away.rename(columns={'away_score': 'goals_scored'})
+goals_scored_home.columns = ['goals_scored']
+goals_scored_away.columns = ['goals_scored']
 
 print(goals_scored_home)
 print(goals_scored_away)
