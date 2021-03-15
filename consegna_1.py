@@ -2,7 +2,7 @@ import pandas as pd
 from itertools import islice
 import matplotlib.pyplot as plt
 
-def team_Indicators(DataFrame,Team,printData,plot):
+def team_indicators(DataFrame, Team, printData=False, plot=False):
     TeamMatches = DataFrame.loc[(DataFrame.home_team == Team) | (DataFrame.away_team == Team)].copy()
 
     wins = len(TeamMatches[((TeamMatches.home_team == Team) & (TeamMatches.home_score > TeamMatches.away_score)) | ((TeamMatches.away_team == Team) & (TeamMatches.home_score < TeamMatches.away_score))].index)
@@ -49,25 +49,27 @@ worldFootball = pd.read_csv("results.csv")
 
 Team = "Italy"
 
-print(team_Indicators(worldFootball,Team,False,False))
-#Andremo ad inserire una colonna con le segueti KeyWords: W = (vittoria/Win), L = (Sconfitta/Lose) e D (Pareggio/Draft)
+#Prelevo dal dataframe tutti i team#
+#prelevo da sia home_team che away_team perché potrebbero esserci squadre che han giocato solo una volta#
 
-'''
-match_results=[]
+allTeams_home = worldFootball[['home_team']].drop_duplicates()
+allTeams_away = worldFootball[['away_team']].drop_duplicates()
 
-for index,row in TeamMatches.iterrows():
-    if(row['home_team'] == Team and row['home_score'] > row['away_score']):
-        match_results.append("W")
-    elif(row['home_away'] == Team and row['away_score'] > row['home_score']):
-        match_results.append("L")
-    elif(row['away_score'] == Team and row['home_score'] > row['home_score']):
-        match_results.append("L")
-    elif(row['home_away'] == Team and row['away_score'] > row['home_score']):
-        match_results.append("W")
-    else:
-        match_results.append("D")
+allTeams_away.columns = ['team']
+allTeams_home.columns = ['team']
+
+allTeams = pd.concat([allTeams_away, allTeams_home]).drop_duplicates()
 
 
-#aggiungiamo la colonna con W,L e D al DataFrame
-newColumn = pd.Series(match_results)
-TeamMatches['result'] = newColumn.values'''
+#associo ad ogni team le proprie statistiche (indicatori)#
+
+
+
+allTeams['indicators'] = (allTeams['team'].map(lambda x: team_indicators(worldFootball, x)))
+
+TeamStats = team_indicators(worldFootball, Team)
+
+BetterTeams = allTeams[['team']][allTeams.indicators > TeamStats]
+
+
+print(BetterTeams)
