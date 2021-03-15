@@ -22,8 +22,15 @@ match_results=[]
 
 for index,row in TeamMatches.iterrows():
     if(row['home_team'] == Team and row['home_score'] > row['away_score']):
+        match_results.append("W")
+    elif(row['home_away'] == Team and row['away_score'] > row['home_score']):
+        match_results.append("L")
+    elif(row['away_score'] == Team and row['home_score'] > row['home_score']):
+        match_results.append("L")
+    elif(row['home_away'] == Team and row['away_score'] > row['home_score']):
+        match_results.append("W")
+    else:
         match_results.append("D")
-    elif(row['home_away'] == Team and row['home_score'] > row['away_score']):
 
 
 #aggiungiamo la colonna con W,L e D al DataFrame
