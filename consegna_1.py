@@ -21,6 +21,10 @@ TeamMatches = worldFootball.loc[(worldFootball.home_team == Team) | (worldFootba
 match_results=[]
 
 for index,row in TeamMatches.iterrows():
+    if(row['home_team'] == Team and row['home_score'] > row['away_score']):
+        match_results.append("D")
+    elif(row['home_away'] == Team and row['home_score'] > row['away_score']):
+
 
 #aggiungiamo la colonna con W,L e D al DataFrame
 newColumn = pd.Series(match_results)
