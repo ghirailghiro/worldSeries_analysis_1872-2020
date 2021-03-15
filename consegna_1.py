@@ -30,22 +30,39 @@ print("Loses : " + str(loses))
 print("Drafts : " + str(drafts))
 print("Sum of W+L+D : " + str(wins+loses+drafts))
 
-goals_scored_home = TeamMatches[['home_score']][(TeamMatches.home_team == Team)]
-goals_scored_away = TeamMatches[['away_score']][(TeamMatches.away_team == Team)]
+goals_home = TeamMatches[['date','home_score','away_score']][(TeamMatches.home_team == Team)]
+goals_away = TeamMatches[['date','away_score','home_score']][(TeamMatches.away_team == Team)]
 
-goals_scored_home.columns = ['goals_scored']
-goals_scored_away.columns = ['goals_scored']
+goals_home.columns = ['date','goals_scored','goals_conceded']
+goals_away.columns = ['date','goals_scored','goals_conceded']
 
-print(goals_scored_home)
-print(goals_scored_away)
-frames_goals = [goals_scored_home,goals_scored_away]
+#print(goals_home)
+#print(goals_away)
 
-goals_scored= pd.concat(frames_goals)
+frames_goals = [goals_home,goals_away]
 
-#print(goals_scored)
+goals= pd.concat(frames_goals).sort_index()
 
-scores_received = TeamMatches[((TeamMatches.home_team == Team) & (TeamMatches.home_score > TeamMatches.away_score)) | ((TeamMatches.away_team == Team) & (TeamMatches.home_score < TeamMatches.away_score))]
+#print(goals)
 
+averageScored = goals['goals_scored'].mean()
+averageConceded = goals['goals_conceded'].mean()
+
+goals['goals_difference']=goals['goals_scored']-goals['goals_conceded']
+
+print("Average scored goals : "+ str(averageScored))
+print("Average conceded goals : "+ str(averageConceded))
+
+print(goals)
+
+#Ploting the results
+'''
+goals.plot(kind = "line", x="date", y="goals_scored", label="Goal Scored")
+goals.plot(kind = "line", x="date", y="goals_conceded", label="Goal Conceded")
+goals.plot(kind = "line", x="date", y="goals_difference", label="Goal Difference")
+
+plt.show()
+'''
 
 #Andremo ad inserire una colonna con le segueti KeyWords: W = (vittoria/Win), L = (Sconfitta/Lose) e D (Pareggio/Draft)
 '''
