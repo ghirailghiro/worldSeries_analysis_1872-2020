@@ -9,4 +9,4 @@ def pretty_print(KeyWord, Value):
     print(Value)
     print("__________________________________________________________________________________________________________________________________________________")
 
-worldFootball = pd.read_csv("Es1_tabella.csv")
+worldFootball = pd.read_csv("results.csv")
