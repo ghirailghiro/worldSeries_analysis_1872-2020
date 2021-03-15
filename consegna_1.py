@@ -15,8 +15,9 @@ Team = "Italy"
 
 #Creazione DataFrame partite di Team
 TeamMatches = worldFootball.loc[(worldFootball.home_team == Team) | (worldFootball.away_team == Team)].copy()
+numberOfMatches = len(TeamMatches.index)
 
-print("Number of Matches : " + str(len(TeamMatches.index)))
+print("Number of Matches : " + str(numberOfMatches))
 
 wins = len(TeamMatches[((TeamMatches.home_team == Team) & (TeamMatches.home_score > TeamMatches.away_score)) | ((TeamMatches.away_team == Team) & (TeamMatches.home_score < TeamMatches.away_score))].index)
 
@@ -29,7 +30,19 @@ print("Loses : " + str(loses))
 print("Drafts : " + str(drafts))
 print("Sum of W+L+D : " + str(wins+loses+drafts))
 
-goals_scored = TeamMatches[((TeamMatches.home_team == Team) & (TeamMatches.home_score > TeamMatches.away_score)) | ((TeamMatches.away_team == Team) & (TeamMatches.home_score < TeamMatches.away_score))]
+goals_scored_home = TeamMatches.loc[['home_score']][(TeamMatches.home_team == Team)]
+goals_scored_away = TeamMatches.loc[['away_score']][(TeamMatches.away_team == Team)]
+
+goals_scored_home.rename(columns={'home_score': 'goals_scored'})
+goals_scored_away.rename(columns={'away_score': 'goals_scored'})
+
+print(goals_scored_home)
+print(goals_scored_away)
+frames_goals = [goals_scored_home,goals_scored_away]
+
+goals_scored= pd.concat(frames_goals)
+
+#print(goals_scored)
 
 scores_received = TeamMatches[((TeamMatches.home_team == Team) & (TeamMatches.home_score > TeamMatches.away_score)) | ((TeamMatches.away_team == Team) & (TeamMatches.home_score < TeamMatches.away_score))]
 
