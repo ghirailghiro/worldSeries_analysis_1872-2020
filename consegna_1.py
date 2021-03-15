@@ -2,6 +2,25 @@ import pandas as pd
 from itertools import islice
 import matplotlib.pyplot as plt
 
+def team_Indicators(DataFrame,Team):
+    TeamMatches = DataFrame.loc[(DataFrame.home_team == Team) | (DataFrame.away_team == Team)].copy()
+
+    wins = len(TeamMatches[((TeamMatches.home_team == Team) & (TeamMatches.home_score > TeamMatches.away_score)) | ((TeamMatches.away_team == Team) & (TeamMatches.home_score < TeamMatches.away_score))].index)
+
+    loses = len(TeamMatches[((TeamMatches.home_team == Team) & (TeamMatches.home_score < TeamMatches.away_score)) | ((TeamMatches.away_team == Team) & (TeamMatches.home_score > TeamMatches.away_score))].index)
+
+    drafts = len(TeamMatches[TeamMatches.home_score == TeamMatches.away_score].index)
+
+    goals_home = TeamMatches[['date','home_score','away_score']][(TeamMatches.home_team == Team)]
+    goals_away = TeamMatches[['date','away_score','home_score']][(TeamMatches.away_team == Team)]
+
+    goals_home.columns = ['date','goals_scored','goals_conceded']
+    goals_away.columns = ['date','goals_scored','goals_conceded']
+    frames_goals = [goals_home,goals_away]
+
+    goals= pd.concat(frames_goals).sort_index()
+
+    return wins,loses,drafts,goals['goals_scored'].mean(),goals['goals_conceded'].mean()
 
 def pretty_print(KeyWord, Value):
     print("--------------------------------------------------------------------------------------------------------------------------------------------------")
@@ -13,6 +32,7 @@ worldFootball = pd.read_csv("results.csv")
 
 Team = "Italy"
 
+print(team_Indicators(worldFootball,Team))
 #Creazione DataFrame partite di Team
 TeamMatches = worldFootball.loc[(worldFootball.home_team == Team) | (worldFootball.away_team == Team)].copy()
 numberOfMatches = len(TeamMatches.index)
