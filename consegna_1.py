@@ -2,7 +2,7 @@ import pandas as pd
 from itertools import islice
 import matplotlib.pyplot as plt
 
-<<<<<<< HEAD
+
 class Indicators:
     meanScores = 0
     meanConceded = 0
@@ -47,10 +47,9 @@ class Indicators:
     pass
 
 
-def team_indicators(DataFrame,Team,printData,plot):
-=======
+
 def team_indicators(DataFrame, Team, printData=False, plot=False):
->>>>>>> 75ae4caafd26e181b69884b7e58c69f57c25c5db
+
     TeamMatches = DataFrame.loc[(DataFrame.home_team == Team) | (DataFrame.away_team == Team)].copy()
 
     wins = len(TeamMatches[((TeamMatches.home_team == Team) & (TeamMatches.home_score > TeamMatches.away_score)) | ((TeamMatches.away_team == Team) & (TeamMatches.home_score < TeamMatches.away_score))].index)
@@ -129,10 +128,10 @@ BetterTeams = allTeams[['team']][allTeams.indicators > TeamStats]
 print(BetterTeams)
 #print(team_Indicators(worldFootball,Team,True,True))
 #Andremo ad inserire una colonna con le segueti KeyWords: W = (vittoria/Win), L = (Sconfitta/Lose) e D (Pareggio/Draft)
-=======
+
 #Prelevo dal dataframe tutti i team#
 #prelevo da sia home_team che away_team perché potrebbero esserci squadre che han giocato solo una volta#
->>>>>>> 75ae4caafd26e181b69884b7e58c69f57c25c5db
+
 
 allTeams_home = worldFootball[['home_team']].drop_duplicates()
 allTeams_away = worldFootball[['away_team']].drop_duplicates()
@@ -151,7 +150,18 @@ allTeams['indicators'] = (allTeams['team'].map(lambda x: team_indicators(worldFo
 
 TeamStats = team_indicators(worldFootball, Team, True)
 
+
 BetterTeams = allTeams[['team']][allTeams.indicators > TeamStats]
 
 
 print(BetterTeams)
+
+
+print(TeamMatches)
+
+
+#aggiungiamo la colonna con W,L e D al DataFrame
+newColumn = pd.Series(match_results)
+TeamMatches['result'] = newColumn.values
+
+
