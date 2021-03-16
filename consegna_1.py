@@ -41,6 +41,9 @@ class Indicators:
         self.goals.plot(kind = "line", x="date", y="goals_conceded", label="Goal Conceded")
         self.goals.plot(kind = "line", x="date", y="goals_difference", label="Goal Difference")
         plt.show()
+    
+    def getData(self):
+        return self.wins,self.loses,self.drafts,self.meanScores,self.meanConceded
 
 
     pass
