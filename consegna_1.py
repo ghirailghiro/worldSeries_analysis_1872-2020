@@ -2,7 +2,6 @@ import pandas as pd
 from itertools import islice
 import matplotlib.pyplot as plt
 
-
 class Indicators:
     meanScores = 0
     meanConceded = 0
@@ -47,9 +46,7 @@ class Indicators:
     pass
 
 
-
 def team_indicators(DataFrame, Team, printData=False, plot=False):
-
     TeamMatches = DataFrame.loc[(DataFrame.home_team == Team) | (DataFrame.away_team == Team)].copy()
 
     wins = len(TeamMatches[((TeamMatches.home_team == Team) & (TeamMatches.home_score > TeamMatches.away_score)) | ((TeamMatches.away_team == Team) & (TeamMatches.home_score < TeamMatches.away_score))].index)
@@ -96,7 +93,6 @@ worldFootball = pd.read_csv("results.csv")
 
 Team = "Italy"
 
-<<<<<<< HEAD
 italia = Indicators(worldFootball,Team)
 
 italia.printData()
@@ -131,7 +127,6 @@ print(BetterTeams)
 
 #Prelevo dal dataframe tutti i team#
 #prelevo da sia home_team che away_team perché potrebbero esserci squadre che han giocato solo una volta#
-
 
 allTeams_home = worldFootball[['home_team']].drop_duplicates()
 allTeams_away = worldFootball[['away_team']].drop_duplicates()
