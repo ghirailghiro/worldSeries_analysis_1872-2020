@@ -7,12 +7,12 @@ class Indicators:
     meanConceded = 0
     TeamMatches = None
     Team = ""
-    wins = None
-    loses = None
-    Drafts = None
+    wins = 0
+    loses = 0
+    Drafts = 0
     goals = None
     def __init__(self,DataFrame,TeamChosen):
-        self.TeamMatches = DataFrame.loc[(DataFrame.home_team == Team) | (DataFrame.away_team == Team)].copy()
+        self.TeamMatches = DataFrame.loc[((DataFrame.home_team == Team) | (DataFrame.away_team == Team)) & (DataFrame.tournament == "FIFA World Cup")].copy()
         self.Team = TeamChosen
         self.wins = len(self.TeamMatches[((self.TeamMatches.home_team == Team) & (self.TeamMatches.home_score > self.TeamMatches.away_score)) | ((self.TeamMatches.away_team == Team) & (self.TeamMatches.home_score < self.TeamMatches.away_score))].index)
         self.loses = len(self.TeamMatches[((self.TeamMatches.home_team == Team) & (self.TeamMatches.home_score < self.TeamMatches.away_score)) | ((self.TeamMatches.away_team == Team) & (self.TeamMatches.home_score > self.TeamMatches.away_score))].index)
@@ -22,8 +22,10 @@ class Indicators:
 
         goals_home.columns = ['date','goals_scored','goals_conceded']
         goals_away.columns = ['date','goals_scored','goals_conceded']
+        
         frames_goals = [goals_home,goals_away]
         self.goals= pd.concat(frames_goals).sort_index()
+        self.goals['date'] = pd.to_datetime(self.goals['date'])
         self.meanScores = self.goals['goals_scored'].mean()
         self.meanConceded = self.goals['goals_conceded'].mean()
 
@@ -37,13 +39,26 @@ class Indicators:
 
     def plotData(self):
         self.goals['goals_difference']=self.goals['goals_scored']-self.goals['goals_conceded']
-        self.goals.plot(kind = "line", x="date", y="goals_scored", label="Goal Scored")
-        self.goals.plot(kind = "line", x="date", y="goals_conceded", label="Goal Conceded")
-        self.goals.plot(kind = "line", x="date", y="goals_difference", label="Goal Difference")
+        perYearPlot = self.goals.groupby(self.goals.date.dt.year).sum()
+        print(perYearPlot)
+        #self.goals.plot(kind = "line", x="date", y="goals_scored", label="Goal Scored")
+        #self.goals.plot(kind = "line", x="date", y="goals_conceded", label="Goal Conceded")
+        #self.goals.plot(kind = "line", x="date", y="goals_difference", label="Goal Difference")
+        perYearPlot.reset_index().plot(kind = "line", x="date", y="goals_scored", label="Goal Scored")
+        perYearPlot.reset_index().plot(kind = "line", x="date", y="goals_conceded", label="Goal Conceded")
+        perYearPlot.reset_index().plot(kind = "line", x="date", y="goals_difference", label="Goal Difference")
         plt.show()
     
+    def printDataFrameGoals(self):
+        print(self.goals['date'])
+        print(self.goals.dtypes)
+
     def getData(self):
         return self.wins,self.loses,self.drafts,self.meanScores,self.meanConceded
+    
+    def getPercentuale(self):
+        total = self.wins+self.loses+self.drafts
+        return (self.wins*100)/total,(self.loses*100)/total,(self.drafts*100)/total
 
 
     pass
@@ -98,8 +113,10 @@ Team = "Italy"
 
 italia = Indicators(worldFootball,Team)
 
-italia.printData()
 italia.plotData()
+
+'''
+#italia.plotData()
 
 #Prelevo dal dataframe tutti i team#
 #prelevo da sia home_team che away_team perché potrebbero esserci squadre che han giocato solo una volta#
@@ -152,3 +169,4 @@ BetterTeams = allTeams[['team']][allTeams.indicators > TeamStats]
 
 
 print(BetterTeams)
+'''
