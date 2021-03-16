@@ -67,7 +67,7 @@ allTeams = pd.concat([allTeams_away, allTeams_home]).drop_duplicates()
 
 allTeams['indicators'] = (allTeams['team'].map(lambda x: team_indicators(worldFootball, x)))
 
-TeamStats = team_indicators(worldFootball, Team)
+TeamStats = team_indicators(worldFootball, Team, True)
 
 BetterTeams = allTeams[['team']][allTeams.indicators > TeamStats]
 
