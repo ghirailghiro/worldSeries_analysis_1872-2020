@@ -5,13 +5,13 @@ import matplotlib.pyplot as plt
 class Indicators:
 
     def __init__(self,DataFrame,TeamChosen):
-        self.TeamMatches = DataFrame.loc[((DataFrame.home_team == Team) | (DataFrame.away_team == Team)) & (DataFrame.tournament == "FIFA World Cup")].copy()
         self.Team = TeamChosen
-        self.wins = len(self.TeamMatches[((self.TeamMatches.home_team == Team) & (self.TeamMatches.home_score > self.TeamMatches.away_score)) | ((self.TeamMatches.away_team == Team) & (self.TeamMatches.home_score < self.TeamMatches.away_score))].index)
-        self.loses = len(self.TeamMatches[((self.TeamMatches.home_team == Team) & (self.TeamMatches.home_score < self.TeamMatches.away_score)) | ((self.TeamMatches.away_team == Team) & (self.TeamMatches.home_score > self.TeamMatches.away_score))].index)
+        self.TeamMatches = DataFrame.loc[((DataFrame.home_team == self.Team) | (DataFrame.away_team == self.Team)) & (DataFrame.tournament == "FIFA World Cup")].copy()
+        self.wins = len(self.TeamMatches[((self.TeamMatches.home_team == self.Team) & (self.TeamMatches.home_score > self.TeamMatches.away_score)) | ((self.TeamMatches.away_team == self.Team) & (self.TeamMatches.home_score < self.TeamMatches.away_score))].index)
+        self.loses = len(self.TeamMatches[((self.TeamMatches.home_team == self.Team) & (self.TeamMatches.home_score < self.TeamMatches.away_score)) | ((self.TeamMatches.away_team == self.Team) & (self.TeamMatches.home_score > self.TeamMatches.away_score))].index)
         self.drafts = len(self.TeamMatches[self.TeamMatches.home_score == self.TeamMatches.away_score].index)
-        goals_home = self.TeamMatches[['date','home_score','away_score']][(self.TeamMatches.home_team == Team)]
-        goals_away = self.TeamMatches[['date','away_score','home_score']][(self.TeamMatches.away_team == Team)]
+        goals_home = self.TeamMatches[['date','home_score','away_score']][(self.TeamMatches.home_team == self.Team)]
+        goals_away = self.TeamMatches[['date','away_score','home_score']][(self.TeamMatches.away_team == self.Team)]
 
         goals_home.columns = ['date','goals_scored','goals_conceded']
         goals_away.columns = ['date','goals_scored','goals_conceded']
@@ -49,7 +49,7 @@ class Indicators:
         print(self.goals.dtypes)
 
     def getData(self):
-        return self.wins,self.loses,self.drafts,self.meanScores,self.meanConceded
+        return self.Team,self.wins,self.loses,self.drafts,self.meanScores,self.meanConceded
     
     def getPercentuale(self):
         total = self.wins+self.loses+self.drafts
@@ -105,6 +105,9 @@ def pretty_print(KeyWord, Value):
 
 worldFootball = pd.read_csv("results.csv")
 
+worldFootball = worldFootball[worldFootball.tournament == "FIFA World Cup"]
+
+
 Team = "Italy"
 
 italia = Indicators(worldFootball,Team)
@@ -137,7 +140,7 @@ print(allTeams)
 
 TeamStats = team_indicators(worldFootball, Team)
 
-BetterTeams = allTeams[['team']][allTeams.indicators > TeamStats]
+#BetterTeams = allTeams[['team']][allTeams.indicators > TeamStats]
 
 
 #print(BetterTeams)
