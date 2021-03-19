@@ -49,13 +49,37 @@ class Indicators:
         print(self.goals.dtypes)
 
     def getData(self):
-        return self.Team,self.wins,self.loses,self.drafts,self.meanScores,self.meanConceded
+        return self.wins,self.loses,self.drafts,self.meanScores,self.meanConceded
     
     def getPercentuale(self):
         total = self.wins+self.loses+self.drafts
         return (self.wins*100)/total,(self.loses*100)/total,(self.drafts*100)/total
 
+    def isBetter(self, otherSquadIndicators):
+        if(self.wins > otherSquadIndicators[0] & self.loses < otherSquadIndicators[1]):
+            return True
+            
+    """if(self.wins < otherSquadIndicators[0] & self.loses >= otherSquadIndicators[1]):
+            return False
+        if(self.wins == otherSquadIndicators[0] & self.loses > otherSquadIndicators[1]):
+            return False
+        if(self.wins == otherSquadIndicators[0] & self.loses == otherSquadIndicators[1]):
+            return self.meanScores - self.meanConceded > otherSquadIndicators[3]-otherSquadIndicators[4]
+        
+        self.matchesPlayed = self.wins + self.loses + self.drafts
+        otherSquadMatches = otherSquadIndicators[0] + otherSquadIndicators[1] + otherSquadIndicators[2]
 
+        if(self.wins > otherSquadIndicators[0] & self.loses > otherSquadIndicators[1]):
+            if(((1/3*self.matchesPlayed)+otherSquadMatches >= self.matchesPlayed) & ((1/3*self.matchesPlayed) - otherSquadMatches <= self.matchesPlayed)):
+                return self.drafts < otherSquadIndicators[2]
+            else:
+                return self.matchesPlayed > otherSquadMatches 
+            
+        if(self.wins < otherSquadIndicators[0] & self.loses < otherSquadIndicators[1]):
+            if(((1/3*self.matchesPlayed)+otherSquadMatches >= self.matchesPlayed) & ((1/3*self.matchesPlayed) - otherSquadMatches <= self.matchesPlayed)):
+                return self.wins/self.matchesPlayed > otherSquadIndicators[0]/otherSquadMatches
+            else:
+                return self.matchesPlayed > otherSquadMatches  """
 
     pass
 
@@ -110,9 +134,9 @@ worldFootball = worldFootball[worldFootball.tournament == "FIFA World Cup"]
 
 Team = "Italy"
 
-italia = Indicators(worldFootball,Team)
+TeamObj = Indicators(worldFootball,Team)
 
-italia.printData()
+TeamObj.printData()
 
 #italia.plotData()
 
@@ -140,10 +164,13 @@ print(allTeams)
 
 TeamStats = team_indicators(worldFootball, Team)
 
-#BetterTeams = allTeams[['team']][allTeams.indicators > TeamStats]
+allTeams['isBetter'] = (allTeams['indicators'].map(lambda x: not TeamObj.isBetter(x))) 
 
+betterTeams = allTeams[allTeams.isBetter == True]
+print("Better Teams")
+print(TeamObj.getData())
+print(betterTeams)
 
-#print(BetterTeams)
 #print(team_Indicators(worldFootball,Team,True,True))
 #Andremo ad inserire una colonna con le segueti KeyWords: W = (vittoria/Win), L = (Sconfitta/Lose) e D (Pareggio/Draft)
 
