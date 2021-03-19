@@ -146,29 +146,6 @@ print(BetterTeams)
 #print(team_Indicators(worldFootball,Team,True,True))
 #Andremo ad inserire una colonna con le segueti KeyWords: W = (vittoria/Win), L = (Sconfitta/Lose) e D (Pareggio/Draft)
 
-#Prelevo dal dataframe tutti i team#
-#prelevo da sia home_team che away_team perché potrebbero esserci squadre che han giocato solo una volta#
-
-allTeams_home = worldFootball[['home_team']].drop_duplicates()
-allTeams_away = worldFootball[['away_team']].drop_duplicates()
-
-allTeams_away.columns = ['team']
-allTeams_home.columns = ['team']
-
-allTeams = pd.concat([allTeams_away, allTeams_home]).drop_duplicates()
-
-
-#associo ad ogni team le proprie statistiche (indicatori)#
-
-
-
-allTeams['indicators'] = (allTeams['team'].map(lambda x: team_indicators(worldFootball, x)))
-
-TeamStats = team_indicators(worldFootball, Team, True)
-
-
-BetterTeams = allTeams[['team']][allTeams.indicators > TeamStats]
-
 
 print(BetterTeams)
 '''
