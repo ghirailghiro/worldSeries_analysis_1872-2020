@@ -159,5 +159,5 @@ print(BetterTeamsByPts)
 betterTeams = allTeams[allTeams.isBetter == True]
 print("Better Teams")
 print(TeamObj.getData())
-print(betterTeams) """
+print(betterTeams)
 
