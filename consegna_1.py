@@ -56,31 +56,12 @@ class Indicators:
         return (self.wins*100)/total,(self.loses*100)/total,(self.drafts*100)/total
 
     def isBetter(self, otherSquadIndicators):
-        if(self.wins > otherSquadIndicators[0] & self.loses < otherSquadIndicators[1]):
+        if(self.wins > otherSquadIndicators[0]  and self.loses <= otherSquadIndicators[1]):
             return True
-            
-    """if(self.wins < otherSquadIndicators[0] & self.loses >= otherSquadIndicators[1]):
-            return False
-        if(self.wins == otherSquadIndicators[0] & self.loses > otherSquadIndicators[1]):
-            return False
-        if(self.wins == otherSquadIndicators[0] & self.loses == otherSquadIndicators[1]):
-            return self.meanScores - self.meanConceded > otherSquadIndicators[3]-otherSquadIndicators[4]
-        
-        self.matchesPlayed = self.wins + self.loses + self.drafts
-        otherSquadMatches = otherSquadIndicators[0] + otherSquadIndicators[1] + otherSquadIndicators[2]
+        if(self.wins == otherSquadIndicators[0] and self.loses < otherSquadIndicators[1]):
+            return True
 
-        if(self.wins > otherSquadIndicators[0] & self.loses > otherSquadIndicators[1]):
-            if(((1/3*self.matchesPlayed)+otherSquadMatches >= self.matchesPlayed) & ((1/3*self.matchesPlayed) - otherSquadMatches <= self.matchesPlayed)):
-                return self.drafts < otherSquadIndicators[2]
-            else:
-                return self.matchesPlayed > otherSquadMatches 
-            
-        if(self.wins < otherSquadIndicators[0] & self.loses < otherSquadIndicators[1]):
-            if(((1/3*self.matchesPlayed)+otherSquadMatches >= self.matchesPlayed) & ((1/3*self.matchesPlayed) - otherSquadMatches <= self.matchesPlayed)):
-                return self.wins/self.matchesPlayed > otherSquadIndicators[0]/otherSquadMatches
-            else:
-                return self.matchesPlayed > otherSquadMatches  """
-
+        return False
     pass
 
 
@@ -160,17 +141,23 @@ allTeams = pd.concat([allTeams_away, allTeams_home]).drop_duplicates()
 
 allTeams['indicators'] = (allTeams['team'].map(lambda x: Indicators(worldFootball, x).getData()))
 
-print(allTeams)
 
 TeamStats = team_indicators(worldFootball, Team)
 
 allTeams['isBetter'] = (allTeams['indicators'].map(lambda x: not TeamObj.isBetter(x))) 
 
+allTeams['Pts'] =  (allTeams['indicators'].map(lambda x: x[0]*3 + x[2])) 
+
+TeamPts = TeamObj.getData()
+TeamPts = TeamPts[0]*3 + TeamPts[2]
+
+BetterTeamsByPts = allTeams[['team', 'Pts']][allTeams.Pts > TeamPts]
+#print(allTeams)
+print(BetterTeamsByPts)
+
+
 betterTeams = allTeams[allTeams.isBetter == True]
 print("Better Teams")
 print(TeamObj.getData())
-print(betterTeams)
-
-#print(team_Indicators(worldFootball,Team,True,True))
-#Andremo ad inserire una colonna con le segueti KeyWords: W = (vittoria/Win), L = (Sconfitta/Lose) e D (Pareggio/Draft)
+print(betterTeams) """
 
