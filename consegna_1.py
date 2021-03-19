@@ -61,6 +61,7 @@ class Indicators:
         return (self.wins*100)/total,(self.loses*100)/total,(self.drafts*100)/total
 
 
+
     pass
 
 
