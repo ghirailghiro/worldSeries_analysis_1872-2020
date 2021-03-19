@@ -68,6 +68,8 @@ class Indicators:
             return True
         if(self.meanConceded > otherSquadIndicators[4]):
             return True
+        if(self.wins == otherSquadIndicators[0] and self.loses == otherSquadIndicators[1] and self.drafts == otherSquadIndicators[2] and self.meanScores == otherSquadIndicators[3] and self.meanConceded == otherSquadIndicators[4]):
+            return True
         return False
     pass
 
@@ -171,6 +173,6 @@ betterTeams = allTeams[allTeams.isBetter == True]
 
 
 print("Better Teams")
-print(TeamObj.getData())
+#print(TeamObj.getData())
 print(betterTeams)
 
