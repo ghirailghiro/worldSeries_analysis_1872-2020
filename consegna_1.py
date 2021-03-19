@@ -3,14 +3,7 @@ from itertools import islice
 import matplotlib.pyplot as plt
 
 class Indicators:
-    meanScores = 0
-    meanConceded = 0
-    TeamMatches = None
-    Team = ""
-    wins = 0
-    loses = 0
-    Drafts = 0
-    goals = None
+
     def __init__(self,DataFrame,TeamChosen):
         self.TeamMatches = DataFrame.loc[((DataFrame.home_team == Team) | (DataFrame.away_team == Team)) & (DataFrame.tournament == "FIFA World Cup")].copy()
         self.Team = TeamChosen
@@ -36,6 +29,8 @@ class Indicators:
         print("Sum of W+L+D : " + str(self.wins+self.loses+self.drafts))
         print("The mean of the scores made by the team : "+str(self.meanScores))
         print("The mean of the scores conceded by the team : "+str(self.meanConceded))
+        print("Print the indicators per match:")
+        print(self.goals)
 
     def plotData(self):
         self.goals['goals_difference']=self.goals['goals_scored']-self.goals['goals_conceded']
@@ -114,10 +109,11 @@ Team = "Italy"
 
 italia = Indicators(worldFootball,Team)
 
-italia.plotData()
+italia.printData()
 
-'''
 #italia.plotData()
+
+
 
 #Prelevo dal dataframe tutti i team#
 #prelevo da sia home_team che away_team perché potrebbero esserci squadre che han giocato solo una volta#
@@ -135,17 +131,16 @@ allTeams = pd.concat([allTeams_away, allTeams_home]).drop_duplicates()
 
 
 
-allTeams['indicators'] = (allTeams['team'].map(lambda x: team_indicators(worldFootball, x)))
+allTeams['indicators'] = (allTeams['team'].map(lambda x: Indicators(worldFootball, x).getData()))
+
+print(allTeams)
 
 TeamStats = team_indicators(worldFootball, Team)
 
 BetterTeams = allTeams[['team']][allTeams.indicators > TeamStats]
 
 
-print(BetterTeams)
+#print(BetterTeams)
 #print(team_Indicators(worldFootball,Team,True,True))
 #Andremo ad inserire una colonna con le segueti KeyWords: W = (vittoria/Win), L = (Sconfitta/Lose) e D (Pareggio/Draft)
 
-
-print(BetterTeams)
-'''
