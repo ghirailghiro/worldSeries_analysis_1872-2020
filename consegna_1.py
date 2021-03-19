@@ -56,11 +56,18 @@ class Indicators:
         return (self.wins*100)/total,(self.loses*100)/total,(self.drafts*100)/total
 
     def isBetter(self, otherSquadIndicators):
-        if(self.wins > otherSquadIndicators[0]  and self.loses <= otherSquadIndicators[1]):
+        if(self.wins > otherSquadIndicators[0]):
             return True
-        if(self.wins == otherSquadIndicators[0] and self.loses < otherSquadIndicators[1]):
+        if(self.wins == otherSquadIndicators[0]):
+            if(self.drafts >= otherSquadIndicators[2] and self.loses < otherSquadIndicators[1]):
+                return True
+        if(self.wins < otherSquadIndicators[0]):
+            if(self.loses > otherSquadIndicators[1]):
+                return self.wins + self.drafts > otherSquadIndicators[0] + otherSquadIndicators[1]  
+        if(self.meanScores > otherSquadIndicators[3]):
             return True
-
+        if(self.meanConceded > otherSquadIndicators[4]):
+            return True
         return False
     pass
 
@@ -144,7 +151,7 @@ allTeams['indicators'] = (allTeams['team'].map(lambda x: Indicators(worldFootbal
 
 TeamStats = team_indicators(worldFootball, Team)
 
-allTeams['isBetter'] = (allTeams['indicators'].map(lambda x: not TeamObj.isBetter(x))) 
+
 
 allTeams['Pts'] =  (allTeams['indicators'].map(lambda x: x[0]*3 + x[2])) 
 
@@ -152,11 +159,17 @@ TeamPts = TeamObj.getData()
 TeamPts = TeamPts[0]*3 + TeamPts[2]
 
 BetterTeamsByPts = allTeams[['team', 'Pts']][allTeams.Pts > TeamPts]
-#print(allTeams)
-print(BetterTeamsByPts)
 
+
+#print(BetterTeamsByPts)
+
+
+allTeams['isBetter'] = (allTeams['indicators'].map(lambda x: not TeamObj.isBetter(x))) 
 
 betterTeams = allTeams[allTeams.isBetter == True]
+
+
+
 print("Better Teams")
 print(TeamObj.getData())
 print(betterTeams)
