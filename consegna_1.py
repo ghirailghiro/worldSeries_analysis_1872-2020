@@ -65,6 +65,9 @@ class Indicators:
         total = self.wins+self.loses+self.drafts
         return (self.wins*100)/total,(self.loses*100)/total,(self.drafts*100)/total
 
+    def getTeamMatches(self):
+        return self.TeamMatches
+
     def isBetter(self, otherTeamIndicators, parameter="wins"):
         if(parameter == "wins"):
             return self.wins >= otherTeamIndicators[0]
@@ -228,3 +231,40 @@ print(f"Teams that have a better mean goals conceded for maatch than {TeamName} 
 print("------------------------------------------------------------------------------------")
 print(betterTeams)
 print("")
+
+
+
+
+#########################################################
+##                  WINNING STREAK                     ##
+#########################################################
+
+def getResult(row):
+    if(row['home_score'] > row['away_score']):
+        if(row['home_team'] == TeamName):
+            return "W"
+        else:
+            return "L"
+    elif(row['home_score'] < row['away_score']):
+        if(row['away_team'] == TeamName):
+            return "W"
+        else:
+            return "L"
+    else:
+            return "D"
+
+TeamMatches = Team.getTeamMatches()
+
+TeamMatches['match_result'] = (TeamMatches.apply(getResult, axis=1))
+
+
+#mezzo copia e incolla da stackof
+g = TeamMatches.match_result.__eq__("W").astype(int).diff().fillna(0).abs().cumsum()
+TeamMatches['consecutive'] = TeamMatches.groupby(g).match_result.cumcount().add(1)
+
+#print di verifica
+#print(TeamMatches['match_result'].to_string())
+
+MaxStreak = TeamMatches[['consecutive']][TeamMatches.match_result == "W"].max()
+
+print(MaxStreak)
