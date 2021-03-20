@@ -50,27 +50,33 @@ class Indicators:
 
     def getData(self):
         return self.wins,self.loses,self.drafts,self.meanScores,self.meanConceded
+    def getMeanScores(self):
+        return self.meanScores
+    def getMeanConceded(self):
+        return self.meanConceded
+    def getWins(self):
+        return self.wins
+    def getLoses(self):
+        return self.loses
+    def getNumMatchesPlayed(self):
+        return self.wins + self.drafts + self.loses
     
     def getPercentuale(self):
         total = self.wins+self.loses+self.drafts
         return (self.wins*100)/total,(self.loses*100)/total,(self.drafts*100)/total
 
-    def isBetter(self, otherSquadIndicators):
-        if(self.wins > otherSquadIndicators[0]):
-            return True
-        if(self.wins == otherSquadIndicators[0]):
-            if(self.drafts >= otherSquadIndicators[2] and self.loses < otherSquadIndicators[1]):
-                return True
-        if(self.wins < otherSquadIndicators[0]):
-            if(self.loses > otherSquadIndicators[1]):
-                return self.wins + self.drafts > otherSquadIndicators[0] + otherSquadIndicators[1]  
-        if(self.meanScores > otherSquadIndicators[3]):
-            return True
-        if(self.meanConceded > otherSquadIndicators[4]):
-            return True
-        if(self.wins == otherSquadIndicators[0] and self.loses == otherSquadIndicators[1] and self.drafts == otherSquadIndicators[2] and self.meanScores == otherSquadIndicators[3] and self.meanConceded == otherSquadIndicators[4]):
-            return True
-        return False
+    def isBetter(self, otherTeamIndicators, parameter="wins"):
+        if(parameter == "wins"):
+            return self.wins >= otherTeamIndicators[0]
+
+        if(parameter == "loses"):
+            return self.wins <= otherTeamIndicators[1]
+
+        if(parameter == "attack"):
+            return self.meanScores >= otherTeamIndicators[3]
+
+        if(parameter == "defense"): 
+            return self.meanConceded <= otherTeamIndicators[4]
     pass
 
 
@@ -122,13 +128,13 @@ worldFootball = pd.read_csv("results.csv")
 worldFootball = worldFootball[worldFootball.tournament == "FIFA World Cup"]
 
 
-Team = "Italy"
+TeamName = "Italy"
 
-TeamObj = Indicators(worldFootball,Team)
+Team = Indicators(worldFootball,TeamName)
 
-TeamObj.printData()
+#Team.printData()
 
-#italia.plotData()
+#Team.plotData()
 
 
 
@@ -151,28 +157,74 @@ allTeams = pd.concat([allTeams_away, allTeams_home]).drop_duplicates()
 allTeams['indicators'] = (allTeams['team'].map(lambda x: Indicators(worldFootball, x).getData()))
 
 
-TeamStats = team_indicators(worldFootball, Team)
+TeamStats = team_indicators(worldFootball, TeamName)
 
 
 
 allTeams['Pts'] =  (allTeams['indicators'].map(lambda x: x[0]*3 + x[2])) 
 
-TeamPts = TeamObj.getData()
+TeamPts = Team.getData()
 TeamPts = TeamPts[0]*3 + TeamPts[2]
 
 BetterTeamsByPts = allTeams[['team', 'Pts']][allTeams.Pts > TeamPts]
 
 
-#print(BetterTeamsByPts)
+print(f"Teams that have gained more points than {TeamName} ({TeamPts})")
+print("------------------------------------------------------------------------------------")
+print(BetterTeamsByPts)
+print("")
+
+#GET BETTER TEAMS BY WINNING TIMES
+allTeams['isBetter'] = (allTeams['indicators'].map(lambda x: not Team.isBetter(x))) 
+allTeams['won/played'] = (allTeams['indicators'].map(lambda x: str(x[0]) + '/' + str(x[0]+x[1]+x[2])))
+allTeams['winning rate'] = (allTeams['indicators'].map(lambda x: x[0] / (x[0]+x[1]+x[2])))
+
+betterTeams = allTeams[['team','won/played', 'winning rate']][allTeams.isBetter == True]
 
 
-allTeams['isBetter'] = (allTeams['indicators'].map(lambda x: not TeamObj.isBetter(x))) 
 
-betterTeams = allTeams[allTeams.isBetter == True]
-
-
-
-print("Better Teams")
-#print(TeamObj.getData())
+print(f"Teams that have won more than {TeamName} ({Team.getWins()}/{Team.getNumMatchesPlayed()} with a winning rate of {Team.getWins()/Team.getNumMatchesPlayed()})")
+print("------------------------------------------------------------------------------------")
 print(betterTeams)
+print("")
 
+
+#GET BETTER TEAMS BY LOSING TIMES
+allTeams['isBetter'] = (allTeams['indicators'].map(lambda x: not Team.isBetter(x, "loses"))) 
+allTeams['lost/played'] = (allTeams['indicators'].map(lambda x: str(x[1]) + '/' + str(x[0]+x[1]+x[2])))
+allTeams['losing rate'] = (allTeams['indicators'].map(lambda x: x[1] / (x[0]+x[1]+x[2])))
+
+betterTeams = allTeams[['team','lost/played', 'losing rate']][allTeams.isBetter == True]
+
+print(f"Teams that have lost less than {TeamName} ({Team.getLoses()}/{Team.getNumMatchesPlayed()} with a losing rate of {Team.getLoses()/Team.getNumMatchesPlayed()})")
+print("------------------------------------------------------------------------------------")
+print(betterTeams)
+print("")
+
+
+#GET BETTER TEAMS BY BEST ATTACKS
+allTeams['isBetter'] = (allTeams['indicators'].map(lambda x: not Team.isBetter(x, "attack"))) 
+allTeams['goals scored rate'] = (allTeams['indicators'].map(lambda x: x[3]))
+allTeams['Matches played'] = (allTeams['indicators'].map(lambda x: x[0] + x[1] + x[2]))
+
+betterTeams = allTeams[['team', 'goals scored rate','Matches played']][allTeams.isBetter == True]
+
+print(f"Teams that have a better mean goals scored for match than {TeamName} ({Team.getMeanScores()} in {Team.getNumMatchesPlayed()} matches played)")
+print("-----------------------------------------------------------------------------------")
+print(betterTeams)
+print("")
+
+
+
+#GET BETTER TEAMS BY BEST DEFENSE
+allTeams['isBetter'] = (allTeams['indicators'].map(lambda x: not Team.isBetter(x, "defense"))) 
+allTeams['goals conceded rate'] = (allTeams['indicators'].map(lambda x: x[4]))
+allTeams['Matches played'] = (allTeams['indicators'].map(lambda x: x[0] + x[1] + x[2]))
+
+
+betterTeams = allTeams[['team','goals conceded rate','Matches played']][allTeams.isBetter == True]
+
+print(f"Teams that have a better mean goals conceded for maatch than {TeamName} ({Team.getMeanConceded()} in {Team.getNumMatchesPlayed()} matches played)")
+print("------------------------------------------------------------------------------------")
+print(betterTeams)
+print("")
