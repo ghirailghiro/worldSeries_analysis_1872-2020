@@ -61,6 +61,12 @@ class Indicators:
         return self.TeamMatches
 
     ## isBetter(): metodo utilizzato per paragonare Team con gli indicatori di altre squadre (indicatori in formato tupla) ##
+    ## paragone che viene eseguito per singolo indicatore:
+    #   - wins: numero vittorie
+    #   - loses: numero sconfitte
+    #   - attack: media gol fatti per partita
+    #   - defense: media gol subiti per partita
+    
     def isBetter(self, otherTeamIndicators, parameter="wins"):
         if(parameter == "wins"):
             return self.wins >= otherTeamIndicators[0]
@@ -76,6 +82,9 @@ class Indicators:
     pass
 
 
+#############################################################
+##
+#############################################################
 
 
 worldFootball = pd.read_csv("results.csv")
@@ -83,7 +92,7 @@ worldFootball = pd.read_csv("results.csv")
 worldFootball = worldFootball[worldFootball.tournament == "FIFA World Cup"]
 
 
-TeamName = "Brazil"
+TeamName = "Italy"
 
 Team = Indicators(worldFootball,TeamName)
 
