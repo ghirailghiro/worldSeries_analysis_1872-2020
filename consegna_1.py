@@ -82,28 +82,46 @@ class Indicators:
     pass
 
 
-#############################################################
-##
-#############################################################
+###########################################################################
+##  Analisi statistiche su <TeamName> nella storia della FIFA World CUP  ##
+###########################################################################
 
-
+# Dataframe con tutte le partite di tutte le nazionali #
 worldFootball = pd.read_csv("results.csv")
 
+# Vengono filtrate tutte e solo quelle della FIFA World Cup #
 worldFootball = worldFootball[worldFootball.tournament == "FIFA World Cup"]
 
-
+# Selezione team su cui eseguire analisi statistiche #
 TeamName = "Italy"
 
+# Vengono reperiti gli indicatori di Team e successivamente visualizzati e graficati #
 Team = Indicators(worldFootball,TeamName)
 
-#Team.printData()
+Team.printData()
 
-#Team.plotData()
+Team.plotData()
 
 
+#################################################
+##   Confronto di Team con le altre squadre    ##
+#################################################
+# Metodi di confronto: 
+#   - per trovare le squadre migliori in assoluto viene stilata una classifica
+#     di tutte le squadre che hanno partecipato alla FWC prendendo in considerazione 
+#     tutte le partite di tutta la storia (3 punti per vittoria, 1 punto per pareggio e 0 per sconfitta)
+#     [Metodo ispirato dallo stesso metodo di confronto utilizzato anche sulla pagina dei mondiali di calcio di Wikipedia]
+#   
+#   -  gli indicatori delle squadre vengono confrontati singolarmente, visualizzando
+#      tutte le squadre che hanno l'indicatore x migliore di Team, con annessi anche dati che contestualizzino
+#      l'indicatore. (Ad esempio nelle medie gol fatti/subiti è giusto tenere conto anche delle partite giocate
+#      in quanto il confronto con le squadre che hanno giocato un numero di partite molto lontano da quello di Team
+#      potrebbe risultare fazioso)#
 
-#Prelevo dal dataframe tutti i team#
-#prelevo da sia home_team che away_team perché potrebbero esserci squadre che han giocato solo una volta#
+
+# Generazione dataframe con tutte le squadre che hanno partecipato a FWC #
+# preleva da sia home_team che away_team perché potrebbero esserci squadre che han giocato solo una volta #
+
 
 allTeams_home = worldFootball[['home_team']].drop_duplicates()
 allTeams_away = worldFootball[['away_team']].drop_duplicates()
@@ -114,15 +132,16 @@ allTeams_home.columns = ['team']
 allTeams = pd.concat([allTeams_away, allTeams_home]).drop_duplicates()
 
 
-#associo ad ogni team le proprie statistiche (indicatori)#
-
+# In tale dataframe associo ad ogni team le proprie statistiche (indicatori, punti) #
+# gli indicatori delle squadre vengono ottenuti creando un oggetto della squadre e utilizzando il gett che restituisce la tupla degli indicatori #
+# Tupla indicatori = (W, L, D, MediaGolFatti, MediaGolSubiti) #
 
 
 allTeams['indicators'] = (allTeams['team'].map(lambda x: Indicators(worldFootball, x).getData()))
 
-
-
 allTeams['Pts'] =  (allTeams['indicators'].map(lambda x: x[0]*3 + x[2])) 
+
+
 
 TeamPts = Team.getData()
 TeamPts = TeamPts[0]*3 + TeamPts[2]
