@@ -159,7 +159,7 @@ print("")
 #GET BETTER TEAMS BY WINNING TIMES:
 #   - isBetter è una series con True/False a seconda se è vero che la squadra ha più vittorie di Team
 #   - won/played contiene una stringa che evidenzia quante vittorie ogni squadra ha ottenuto e su quante partite
-#   - winnin rate contiene il rateo vittore (vittorie/partite_giocate)
+#   - winning rate contiene il rateo vittore (vittorie/partite_giocate)
 
 allTeams['isBetter'] = (allTeams['indicators'].map(lambda x: not Team.isBetter(x))) 
 allTeams['won/played'] = (allTeams['indicators'].map(lambda x: str(x[0]) + '/' + str(x[0]+x[1]+x[2])))
@@ -193,15 +193,16 @@ print("")
 
 
 #GET BETTER TEAMS BY BEST ATTACKS 
-#   - isBetter è una series con True/False a seconda se è vero che la squadra ha un attacco migliore di quello di Team 
-#   - won/played contiene una stringa che evidenzia quante vittorie ogni squadra ha ottenuto e su quante partite
-#   - winnin rate contiene il rateo vittore (vittorie/partite_giocate)
+#   - isBetter è una series con True/False a seconda se è vero che la squadra ha un attacco migliore di quello di Team (media gol fatti per partia)
+#   - goals scored rate contiene la media gol fatti
+#   - Matches played contiene il numero di partite giocate
 allTeams['isBetter'] = (allTeams['indicators'].map(lambda x: not Team.isBetter(x, "attack"))) 
 allTeams['goals scored rate'] = (allTeams['indicators'].map(lambda x: x[3]))
 allTeams['Matches played'] = (allTeams['indicators'].map(lambda x: x[0] + x[1] + x[2]))
 
 betterTeams = allTeams[['team', 'goals scored rate','Matches played']][allTeams.isBetter == True]
 
+# visualizzo square con un attacco migliore di Team #
 print(f"Teams that have a better mean goals scored for match than {TeamName} ({Team.getMeanScores()} in {Team.getNumMatchesPlayed()} matches played)")
 print("-----------------------------------------------------------------------------------")
 print(betterTeams)
@@ -210,6 +211,9 @@ print("")
 
 
 #GET BETTER TEAMS BY BEST DEFENSE
+#   - isBetter è una series con True/False a seconda se è vero che la squadra ha una difesa migliore di Team (media gol subiti per partita)
+#   - goals conceded rate contiene la media di gol subiti per partita
+#   - Matches played contiene il numero di partite giocate
 allTeams['isBetter'] = (allTeams['indicators'].map(lambda x: not Team.isBetter(x, "defense"))) 
 allTeams['goals conceded rate'] = (allTeams['indicators'].map(lambda x: x[4]))
 allTeams['Matches played'] = (allTeams['indicators'].map(lambda x: x[0] + x[1] + x[2]))
@@ -217,6 +221,7 @@ allTeams['Matches played'] = (allTeams['indicators'].map(lambda x: x[0] + x[1] +
 
 betterTeams = allTeams[['team','goals conceded rate','Matches played']][allTeams.isBetter == True]
 
+# Visualizzo squadre che hanno una difesa migliore di Team #
 print(f"Teams that have a better mean goals conceded for maatch than {TeamName} ({Team.getMeanConceded()} in {Team.getNumMatchesPlayed()} matches played)")
 print("------------------------------------------------------------------------------------")
 print(betterTeams)
