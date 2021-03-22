@@ -234,6 +234,8 @@ print("")
 ##                  WINNING STREAK                     ##
 #########################################################
 
+
+## Funzione ausiliaria utilizzata per determinare se Team ha vinto la partita associata ##
 def getResult(row):
     if(row['home_score'] > row['away_score']):
         if(row['home_team'] == TeamName):
@@ -248,25 +250,20 @@ def getResult(row):
     else:
             return "D"
 
+# Ottengo tutte le partite giocate da Team #
 TeamMatches = Team.getTeamMatches()
 
+# Aggiungo la colonna/series dell'esito della partite dal punto di vista di Team (W,L,D) #
 TeamMatches['match_result'] = (TeamMatches.apply(getResult, axis=1))
 
-#mezzo copia e incolla da stackof
+# Creo colonna consecutive che conta quante W, D e L consecutive ci sono 
 g = TeamMatches.match_result.__eq__("W").astype(int).diff().fillna(0).abs().cumsum()
 TeamMatches['consecutive'] = TeamMatches.groupby(g).match_result.cumcount().add(1)
 
-
-print(TeamMatches)
-
-#print di verifica
-#print(TeamMatches['match_result'].to_string())
-
+# Nella colonna consecutive prendo solo i numeri assocciati alle vittorie, poi prendo il numero massimo #
 MaxStreak = TeamMatches[['consecutive']][TeamMatches.match_result == "W"].max()
 
+# Visualizzo serie di vittorie più lunga per Team # 
+print(f"Longest winning streak for {TeamName}: {MaxStreak}")
 
-print(f"Longest winning streak for {TeamName}:")
-print(MaxStreak)
-print("")
 
-Team.plotData()
