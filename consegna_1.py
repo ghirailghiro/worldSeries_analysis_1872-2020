@@ -39,18 +39,12 @@ class Indicators:
     def plotData(self):
         self.goals['goals_difference'] = self.goals['goals_scored'] - self.goals['goals_conceded']
         perYearPlot = self.goals.groupby(self.goals.date.dt.year).sum()
-        #self.goals.plot(kind = "line", x="date", y="goals_scored", label="Goal Scored")
-        #self.goals.plot(kind = "line", x="date", y="goals_conceded", label="Goal Conceded")
-        #self.goals.plot(kind = "line", x="date", y="goals_difference", label="Goal Difference")
         perYearPlot.reset_index().plot(kind = "line", x="date", y="goals_scored", label="Goal Scored")
         perYearPlot.reset_index().plot(kind = "line", x="date", y="goals_conceded", label="Goal Conceded")
         perYearPlot.reset_index().plot(kind = "line", x="date", y="goals_difference", label="Goal Difference")
         plt.show()
     
-    def printDataFrameGoals(self):
-        print(self.goals['date'])
-        print(self.goals.dtypes)
-
+    ## metodi getter ##
     def getData(self):
         return self.wins,self.loses,self.drafts,self.meanScores,self.meanConceded
     def getMeanScores(self):
@@ -63,10 +57,10 @@ class Indicators:
         return self.loses
     def getNumMatchesPlayed(self):
         return self.wins + self.drafts + self.loses
-
     def getTeamMatches(self):
         return self.TeamMatches
 
+    ## isBetter(): metodo utilizzato per paragonare Team con gli indicatori di altre squadre (indicatori in formato tupla) ##
     def isBetter(self, otherTeamIndicators, parameter="wins"):
         if(parameter == "wins"):
             return self.wins >= otherTeamIndicators[0]
