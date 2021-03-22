@@ -2,6 +2,10 @@ import pandas as pd
 from itertools import islice
 import matplotlib.pyplot as plt
 
+
+##  Classe Indicators utilizzata per contener einformazioni su Team (= squadra scelta)  ##
+## __init__: inizializza le varie istanze dell'oggetto, che poi saranno gli indicatori di Team ##
+
 class Indicators:
 
     def __init__(self,DataFrame,TeamChosen):
@@ -17,7 +21,7 @@ class Indicators:
         goals_away.columns = ['date','goals_scored','goals_conceded']
         
         frames_goals = [goals_home,goals_away]
-        self.goals= pd.concat(frames_goals).sort_index()
+        self.goals = pd.concat(frames_goals).sort_index()
         self.goals['date'] = pd.to_datetime(self.goals['date'])
         self.meanScores = self.goals['goals_scored'].mean()
         self.meanConceded = self.goals['goals_conceded'].mean()
@@ -27,15 +31,14 @@ class Indicators:
         print("Loses : " + str(self.loses))
         print("Drafts : " + str(self.drafts))
         print("Sum of W+L+D : " + str(self.wins+self.loses+self.drafts))
-        print("The mean of the scores made by the team : "+str(self.meanScores))
-        print("The mean of the scores conceded by the team : "+str(self.meanConceded))
-        print("Print the indicators per match:")
-        print(self.goals)
+        print("The mean of the scores made by the team : " + str(self.meanScores))
+        print("The mean of the scores conceded by the team : " + str(self.meanConceded))
 
+
+    ## plotData(): metodo utilizzato per graficare il numero dei gol fatti e subiti di Team ogni anno 
     def plotData(self):
-        self.goals['goals_difference']=self.goals['goals_scored']-self.goals['goals_conceded']
+        self.goals['goals_difference'] = self.goals['goals_scored'] - self.goals['goals_conceded']
         perYearPlot = self.goals.groupby(self.goals.date.dt.year).sum()
-        print(perYearPlot)
         #self.goals.plot(kind = "line", x="date", y="goals_scored", label="Goal Scored")
         #self.goals.plot(kind = "line", x="date", y="goals_conceded", label="Goal Conceded")
         #self.goals.plot(kind = "line", x="date", y="goals_difference", label="Goal Difference")
@@ -60,10 +63,6 @@ class Indicators:
         return self.loses
     def getNumMatchesPlayed(self):
         return self.wins + self.drafts + self.loses
-    
-    def getPercentuale(self):
-        total = self.wins+self.loses+self.drafts
-        return (self.wins*100)/total,(self.loses*100)/total,(self.drafts*100)/total
 
     def getTeamMatches(self):
         return self.TeamMatches
@@ -83,55 +82,14 @@ class Indicators:
     pass
 
 
-def team_indicators(DataFrame, Team, printData=False, plot=False):
-    TeamMatches = DataFrame.loc[(DataFrame.home_team == Team) | (DataFrame.away_team == Team)].copy()
 
-    wins = len(TeamMatches[((TeamMatches.home_team == Team) & (TeamMatches.home_score > TeamMatches.away_score)) | ((TeamMatches.away_team == Team) & (TeamMatches.home_score < TeamMatches.away_score))].index)
-
-    loses = len(TeamMatches[((TeamMatches.home_team == Team) & (TeamMatches.home_score < TeamMatches.away_score)) | ((TeamMatches.away_team == Team) & (TeamMatches.home_score > TeamMatches.away_score))].index)
-
-    drafts = len(TeamMatches[TeamMatches.home_score == TeamMatches.away_score].index)
-
-    goals_home = TeamMatches[['date','home_score','away_score']][(TeamMatches.home_team == Team)]
-    goals_away = TeamMatches[['date','away_score','home_score']][(TeamMatches.away_team == Team)]
-
-    goals_home.columns = ['date','goals_scored','goals_conceded']
-    goals_away.columns = ['date','goals_scored','goals_conceded']
-    frames_goals = [goals_home,goals_away]
-    goals= pd.concat(frames_goals).sort_index()
-    scored_mean = goals['goals_scored'].mean()
-    conceded_mean = goals['goals_conceded'].mean()
-    if(printData):
-        print("Wins : " + str(wins))
-        print("Loses : " + str(loses))
-        print("Drafts : " + str(drafts))
-        print("Sum of W+L+D : " + str(wins+loses+drafts))
-        print("Average scored goals : "+ str(scored_mean))
-        print("Average conceded goals : "+ str(conceded_mean))
-    
-    if(plot):
-        goals['goals_difference']=goals['goals_scored']-goals['goals_conceded']
-        goals.plot(kind = "line", x="date", y="goals_scored", label="Goal Scored")
-        goals.plot(kind = "line", x="date", y="goals_conceded", label="Goal Conceded")
-        goals.plot(kind = "line", x="date", y="goals_difference", label="Goal Difference")
-        plt.show()
-
-    del TeamMatches
-
-    return wins,loses,drafts,scored_mean,conceded_mean
-
-def pretty_print(KeyWord, Value):
-    print("--------------------------------------------------------------------------------------------------------------------------------------------------")
-    print(KeyWord)
-    print(Value)
-    print("__________________________________________________________________________________________________________________________________________________")
 
 worldFootball = pd.read_csv("results.csv")
 
 worldFootball = worldFootball[worldFootball.tournament == "FIFA World Cup"]
 
 
-TeamName = "Italy"
+TeamName = "Brazil"
 
 Team = Indicators(worldFootball,TeamName)
 
@@ -158,9 +116,6 @@ allTeams = pd.concat([allTeams_away, allTeams_home]).drop_duplicates()
 
 
 allTeams['indicators'] = (allTeams['team'].map(lambda x: Indicators(worldFootball, x).getData()))
-
-
-TeamStats = team_indicators(worldFootball, TeamName)
 
 
 
@@ -257,14 +212,21 @@ TeamMatches = Team.getTeamMatches()
 
 TeamMatches['match_result'] = (TeamMatches.apply(getResult, axis=1))
 
-
 #mezzo copia e incolla da stackof
 g = TeamMatches.match_result.__eq__("W").astype(int).diff().fillna(0).abs().cumsum()
 TeamMatches['consecutive'] = TeamMatches.groupby(g).match_result.cumcount().add(1)
+
+
+print(TeamMatches)
 
 #print di verifica
 #print(TeamMatches['match_result'].to_string())
 
 MaxStreak = TeamMatches[['consecutive']][TeamMatches.match_result == "W"].max()
 
+
+print(f"Longest winning streak for {TeamName}:")
 print(MaxStreak)
+print("")
+
+Team.plotData()
