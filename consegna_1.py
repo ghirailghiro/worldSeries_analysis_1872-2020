@@ -141,20 +141,26 @@ allTeams['indicators'] = (allTeams['team'].map(lambda x: Indicators(worldFootbal
 
 allTeams['Pts'] =  (allTeams['indicators'].map(lambda x: x[0]*3 + x[2])) 
 
-
+# ottengo i punti di Team #
 
 TeamPts = Team.getData()
 TeamPts = TeamPts[0]*3 + TeamPts[2]
 
+# filtro tutte le squadre che hanno ottenuto un punteggio migliore di quello di Team #
 BetterTeamsByPts = allTeams[['team', 'Pts']][allTeams.Pts > TeamPts]
 
-
+# visualizzo le squadre migliori #
 print(f"Teams that have gained more points than {TeamName} ({TeamPts})")
 print("------------------------------------------------------------------------------------")
 print(BetterTeamsByPts)
 print("")
 
-#GET BETTER TEAMS BY WINNING TIMES
+
+#GET BETTER TEAMS BY WINNING TIMES:
+#   - isBetter è una series con True/False a seconda se è vero che la squadra ha più vittorie di Team
+#   - won/played contiene una stringa che evidenzia quante vittorie ogni squadra ha ottenuto e su quante partite
+#   - winnin rate contiene il rateo vittore (vittorie/partite_giocate)
+
 allTeams['isBetter'] = (allTeams['indicators'].map(lambda x: not Team.isBetter(x))) 
 allTeams['won/played'] = (allTeams['indicators'].map(lambda x: str(x[0]) + '/' + str(x[0]+x[1]+x[2])))
 allTeams['winning rate'] = (allTeams['indicators'].map(lambda x: x[0] / (x[0]+x[1]+x[2])))
@@ -162,7 +168,7 @@ allTeams['winning rate'] = (allTeams['indicators'].map(lambda x: x[0] / (x[0]+x[
 betterTeams = allTeams[['team','won/played', 'winning rate']][allTeams.isBetter == True]
 
 
-
+# Visualizzo squadre che hanno vinto più di Team#
 print(f"Teams that have won more than {TeamName} ({Team.getWins()}/{Team.getNumMatchesPlayed()} with a winning rate of {Team.getWins()/Team.getNumMatchesPlayed()})")
 print("------------------------------------------------------------------------------------")
 print(betterTeams)
@@ -170,19 +176,26 @@ print("")
 
 
 #GET BETTER TEAMS BY LOSING TIMES
+#   - isBetter è una series con True/False a seconda se è vero che la squadra ha meno sconfitte di Team
+#   - lost/played contiene una stringa che evidenzia quante sconfitte ogni squadra ha ottenuto e su quante partite
+#   - losing rate rate contiene il rateo sconfitta (sconfitte/partite_giocate)
 allTeams['isBetter'] = (allTeams['indicators'].map(lambda x: not Team.isBetter(x, "loses"))) 
 allTeams['lost/played'] = (allTeams['indicators'].map(lambda x: str(x[1]) + '/' + str(x[0]+x[1]+x[2])))
 allTeams['losing rate'] = (allTeams['indicators'].map(lambda x: x[1] / (x[0]+x[1]+x[2])))
 
 betterTeams = allTeams[['team','lost/played', 'losing rate']][allTeams.isBetter == True]
 
+# Visualizzo squadre che hanno perso meno di Team #
 print(f"Teams that have lost less than {TeamName} ({Team.getLoses()}/{Team.getNumMatchesPlayed()} with a losing rate of {Team.getLoses()/Team.getNumMatchesPlayed()})")
 print("------------------------------------------------------------------------------------")
 print(betterTeams)
 print("")
 
 
-#GET BETTER TEAMS BY BEST ATTACKS
+#GET BETTER TEAMS BY BEST ATTACKS 
+#   - isBetter è una series con True/False a seconda se è vero che la squadra ha un attacco migliore di quello di Team 
+#   - won/played contiene una stringa che evidenzia quante vittorie ogni squadra ha ottenuto e su quante partite
+#   - winnin rate contiene il rateo vittore (vittorie/partite_giocate)
 allTeams['isBetter'] = (allTeams['indicators'].map(lambda x: not Team.isBetter(x, "attack"))) 
 allTeams['goals scored rate'] = (allTeams['indicators'].map(lambda x: x[3]))
 allTeams['Matches played'] = (allTeams['indicators'].map(lambda x: x[0] + x[1] + x[2]))
