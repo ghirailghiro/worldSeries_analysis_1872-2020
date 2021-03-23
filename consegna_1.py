@@ -10,7 +10,7 @@ class Indicators:
 
     def __init__(self,DataFrame,TeamChosen):
         self.Team = TeamChosen
-        self.TeamMatches = DataFrame.loc[((DataFrame.home_team == self.Team) | (DataFrame.away_team == self.Team)) & (DataFrame.tournament == "FIFA World Cup")].copy()
+        self.TeamMatches = DataFrame.loc[((DataFrame.home_team == self.Team) | (DataFrame.away_team == self.Team))].copy()
         self.wins = len(self.TeamMatches[((self.TeamMatches.home_team == self.Team) & (self.TeamMatches.home_score > self.TeamMatches.away_score)) | ((self.TeamMatches.away_team == self.Team) & (self.TeamMatches.home_score < self.TeamMatches.away_score))].index)
         self.loses = len(self.TeamMatches[((self.TeamMatches.home_team == self.Team) & (self.TeamMatches.home_score < self.TeamMatches.away_score)) | ((self.TeamMatches.away_team == self.Team) & (self.TeamMatches.home_score > self.TeamMatches.away_score))].index)
         self.drafts = len(self.TeamMatches[self.TeamMatches.home_score == self.TeamMatches.away_score].index)
@@ -72,7 +72,7 @@ class Indicators:
             return self.wins >= otherTeamIndicators[0]
 
         if(parameter == "loses"):
-            return self.wins <= otherTeamIndicators[1]
+            return self.loses <= otherTeamIndicators[1]
 
         if(parameter == "attack"):
             return self.meanScores >= otherTeamIndicators[3]
@@ -123,8 +123,8 @@ Team.plotData()
 # preleva da sia home_team che away_team perché potrebbero esserci squadre che han giocato solo una volta #
 
 
-allTeams_home = worldFootball[['home_team']].drop_duplicates()
-allTeams_away = worldFootball[['away_team']].drop_duplicates()
+allTeams_home = worldFootball[['home_team']]
+allTeams_away = worldFootball[['away_team']]
 
 allTeams_away.columns = ['team']
 allTeams_home.columns = ['team']
@@ -167,7 +167,6 @@ allTeams['winning rate'] = (allTeams['indicators'].map(lambda x: x[0] / (x[0]+x[
 
 betterTeams = allTeams[['team','won/played', 'winning rate']][allTeams.isBetter == True]
 
-
 # Visualizzo squadre che hanno vinto più di Team#
 print(f"Teams that have won more than {TeamName} ({Team.getWins()}/{Team.getNumMatchesPlayed()} with a winning rate of {Team.getWins()/Team.getNumMatchesPlayed()})")
 print("------------------------------------------------------------------------------------")
@@ -179,7 +178,7 @@ print("")
 #   - isBetter è una series con True/False a seconda se è vero che la squadra ha meno sconfitte di Team
 #   - lost/played contiene una stringa che evidenzia quante sconfitte ogni squadra ha ottenuto e su quante partite
 #   - losing rate rate contiene il rateo sconfitta (sconfitte/partite_giocate)
-allTeams['isBetter'] = (allTeams['indicators'].map(lambda x: not Team.isBetter(x, "loses"))) 
+allTeams['isBetter'] = (allTeams['indicators'].map(lambda x: not Team.isBetter(x, 'loses'))) 
 allTeams['lost/played'] = (allTeams['indicators'].map(lambda x: str(x[1]) + '/' + str(x[0]+x[1]+x[2])))
 allTeams['losing rate'] = (allTeams['indicators'].map(lambda x: x[1] / (x[0]+x[1]+x[2])))
 
